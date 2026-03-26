@@ -3,7 +3,9 @@ Lively Kernel is a web-based self-modifying runtime environment developed at Sun
 
 <img width="500" height="327" alt="image" src="https://github.com/user-attachments/assets/968af477-7d97-433b-a12d-67d80d40d4cf" />
 
- Update (May 2, 2008): The latest development versions of the Lively Kernel are now available on http://livelykernel.sunlabs.com/. Refer to technical documentation for details.
+Note: The Lively Kernel runs best in the Safari 3 web browser. With all the other web browsers, you may still experience bugs and unusual behavior.
+
+ Update (May 2, 2008): The latest development versions of the Lively Kernel are now available on [http://livelykernel.sunlabs.com/](https://web.archive.org/web/20080709194902/https://research.sun.com/projects/lively/). Refer to technical documentation for details.
 
 Update (February 8, 2008): Version 0.8.1 of the Lively Kernel is now available. A new technical report is also available.
 
