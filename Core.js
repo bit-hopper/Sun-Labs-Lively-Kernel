@@ -1675,9 +1675,13 @@ Object.extend(window.parent, {
 });
 
 if (UserAgent.canExtendBrowserObjects) Object.extend(document, {
-    oncontextmenu: function(evt) { 
-        var targetMorph = evt.target.parentNode; // target is probably shape (change me if pointer-events changes for shapes)
-        if ((targetMorph instanceof Morph) 
+    oncontextmenu: function(evt) {
+        // walk up from the clicked shape node to the nearest node carrying an owningMorph back-reference
+        var targetMorph = null;
+        for (var node = evt.target; node && !targetMorph; node = node.parentNode) {
+            targetMorph = node.owningMorph;
+        }
+        if (targetMorph
             && !(targetMorph instanceof WorldMorph)) {
             evt.preventDefault();
             var topElement = (evt.currentTarget.nearestViewportElement || Canvas).parentNode;
@@ -2265,20 +2269,27 @@ Shape.subclass('PathShape', {
         return this.verticesList;
     },
     
-    moveTo: function(x, y) {
-        this.rawNode.pathSegList.appendItem(this.rawNode.createSVGPathSegMovetoAbs(x, y));
+    // pathSegList/createSVGPathSeg* were removed from every modern browser; build the "d" attribute by hand instead
+    appendPathCommand: function(cmd) {
+        var d = this.rawNode.getAttributeNS(null, "d") || "";
+        this.rawNode.setAttributeNS(null, "d", d + cmd);
+        delete this.cachedBounds;
     },
-    
+
+    moveTo: function(x, y) {
+        this.appendPathCommand("M" + x + "," + y);
+    },
+
     curveTo: function(x, y) {
-        this.rawNode.pathSegList.appendItem(this.rawNode.createSVGPathSegCurvetoQuadraticSmoothAbs(x, y));
+        this.appendPathCommand("T" + x + "," + y);
     },
 
     lineTo: function(x, y) {
-        this.rawNode.pathSegList.appendItem(this.rawNode.createSVGPathSegLinetoAbs(x, y));
+        this.appendPathCommand("L" + x + "," + y);
     },
 
     close: function() {
-        this.rawNode.pathSegList.appendItem(this.rawNode.createSVGPathSegClosePath());
+        this.appendPathCommand("Z");
     },
 
     containsPoint: function(p) {
@@ -2630,6 +2641,7 @@ Morph = Visual.subclass("Morph", {
     
     internalInitialize: function(rawNode, transform) {
         this.rawNode = rawNode;
+        this.rawNode.owningMorph = this; // lets DOM-level handlers (e.g. oncontextmenu) map a raw node back to its Morph
         this.submorphs = [];
         this.rawSubnodes = null;
         this.owner = null;
