@@ -88,7 +88,8 @@ var Config = {
     
     useDropShadow: UserAgent.usableDropShadow,
 
-    useGetTransformToElement: true,
+    // getTransformToElement was removed from every modern browser; use the matrix-math fallback in transformToMorph
+    useGetTransformToElement: false,
 
     // We haven't decided on the behavior yet, but let's be brave!
     // This option suspends all the scripts in a world as soon as
